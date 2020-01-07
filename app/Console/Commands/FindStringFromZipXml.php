@@ -19,7 +19,7 @@ class FindStringFromZipXml extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Find full name of company in zip files.';
 
     /**
      * Create a new command instance.

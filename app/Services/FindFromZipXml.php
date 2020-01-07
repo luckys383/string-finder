@@ -55,7 +55,7 @@ class FindFromZipXml
 			// extract zip file inside tmp folder.
             $extractZip->extract();
 
-            $this->readFilesFromDir($zipFileName, $tmpPath);
+            $isFindString = $this->readFilesFromDir($zipFileName, $tmpPath);
 
             // remove extracted files.
             $extractZip->cleanDestinationFolder($tmpPath);
@@ -64,6 +64,10 @@ class FindFromZipXml
             if(($key+1)%10 == 0) {
                 error_log("Total number of processed files are " . ($key+1) . "/" . $totalFiles);
             }
+
+            if($isFindString) {
+                break;
+            }
         }
     }
 
@@ -71,46 +75,57 @@ class FindFromZipXml
     {
         $path = config("string_finder.xml_path");
         $path .= "_".$this->quarter;
-        $backupPath = $path . "/backup";
+        $backupPath = $path . "/backup/";
         $files = glob($backupPath . '/*.[zZ][iI][pP]');
         foreach($files as $file)
         {
-            \File::move($file, $path);
+            $zipFileName = basename($file);
+            \File::move($file, $path.$zipFileName);
         }
     }
 
     private function readFilesFromDir($zipFileName, $tmpPath)
     {
         $files = glob($tmpPath . '/*.[xX][mM][lL]');
-        
+        $isFindString = false;
         foreach($files as $file)
         {
-            $this->findString($zipFileName, $file);
+            $isFindString = $this->findString($zipFileName, $file);
         }
+        return $isFindString;
     }
 
     public function findString($zipFileName, $file)
     {
+        $isFindString = false;
         $reader  = new XMLReader();
         $reader->open($file);
         while( $reader->read() ) {
             if($reader->name == "Organization" && $reader->nodeType == XMLReader::ELEMENT) {
                 $name = $reader->getAttribute('Name');
-                if(strtolower($name) == strtolower($this->string)) {
-                    $isSeller = $reader->getAttribute('IsSeller');
-                    $isBuyer = $reader->getAttribute('IsBuyer');
+                
+                $isSeller = $reader->getAttribute('IsSeller');
+                $isBuyer = $reader->getAttribute('IsBuyer');
+                if(strtolower($name) == strtolower($this->string) && $isSeller == "true") {
 
+                    $calcuateRevenueObj = new CalculateSellerRevenue($file);
+                    $calcuateRevenueObj->calculate();
+                    $revenue = $calcuateRevenueObj->getRevenue();
                     error_log(" --------------------------------- ");
                     error_log("'" . $name . "' string found in zip file name:- " . $zipFileName);
+                    error_log("Quarter: ".$this->quarter);
+                    error_log("Total Revenue: $revenue");
                     error_log("Is Seller: $isSeller");
                     error_log("Is Buyer: $isBuyer");
                     error_log(" --------------------------------- ");
+                    $isFindString = true;
                     break;
                 }
             }
         }
 
         $reader->close();
+        return $isFindString;
     }
 
     private function moveToBackupDir($file)
