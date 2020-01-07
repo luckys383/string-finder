@@ -80,7 +80,7 @@ class FindFromZipXml
         foreach($files as $file)
         {
             $zipFileName = basename($file);
-            \File::move($file, $path.$zipFileName);
+            \File::move($file, $path."/".$zipFileName);
         }
     }
 
@@ -108,13 +108,19 @@ class FindFromZipXml
                 $isBuyer = $reader->getAttribute('IsBuyer');
                 if(strtolower($name) == strtolower($this->string) && $isSeller == "true") {
 
-                    $calcuateRevenueObj = new CalculateSellerRevenue($file);
-                    $calcuateRevenueObj->calculate();
+                    $calcuateRevenueObj = new SellerTransactions($file);
+                    $calcuateRevenueObj->filterTransactions();
                     $revenue = $calcuateRevenueObj->getRevenue();
+                    $products = $calcuateRevenueObj->getProductNames();
+                    $podba = $calcuateRevenueObj->getPODBA();
+                    $podsl = $calcuateRevenueObj->getPODSL();
                     error_log(" --------------------------------- ");
                     error_log("'" . $name . "' string found in zip file name:- " . $zipFileName);
                     error_log("Quarter: ".$this->quarter);
                     error_log("Total Revenue: $revenue");
+                    error_log("Product Names: $products");
+                    error_log("Balancing Authorities: $podba");
+                    error_log("PODSL: $podsl");
                     error_log("Is Seller: $isSeller");
                     error_log("Is Buyer: $isBuyer");
                     error_log(" --------------------------------- ");
