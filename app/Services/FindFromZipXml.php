@@ -97,7 +97,14 @@ class FindFromZipXml
             if($reader->name == "Organization" && $reader->nodeType == XMLReader::ELEMENT) {
                 $name = $reader->getAttribute('Name');
                 if(strtolower($name) == strtolower($this->string)) {
+                    $isSeller = $reader->getAttribute('IsSeller');
+                    $isBuyer = $reader->getAttribute('IsBuyer');
+
+                    error_log(" --------------------------------- ");
                     error_log("'" . $name . "' string found in zip file name:- " . $zipFileName);
+                    error_log("Is Seller: $isSeller");
+                    error_log("Is Buyer: $isBuyer");
+                    error_log(" --------------------------------- ");
                     break;
                 }
             }
