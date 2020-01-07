@@ -8,11 +8,17 @@ class FindFromZipXml
 {
     protected $string = "Frenchtown II Solar";
     protected $limit = "all";
+    protected $quarter = 1;
 
     public function __construct()
     {
     }
 
+    public function setQuarter($quarter)
+    {
+        $this->quarter = $quarter;
+        return $this;
+    }
     public function setString($string)
     {
         $this->string = $string;
@@ -28,6 +34,7 @@ class FindFromZipXml
     public function exec()
     {
         $path = config("string_finder.xml_path");
+        $path .= "_".$this->quarter;
         $tmpPath = $path . "/tmp";
         $files = glob($path . '/*.[zZ][iI][pP]');
         $totalFiles = count($files);
@@ -57,6 +64,18 @@ class FindFromZipXml
             if(($key+1)%10 == 0) {
                 error_log("Total number of processed files are " . ($key+1) . "/" . $totalFiles);
             }
+        }
+    }
+
+    public function restoreFiles()
+    {
+        $path = config("string_finder.xml_path");
+        $path .= "_".$this->quarter;
+        $backupPath = $path . "/backup";
+        $files = glob($backupPath . '/*.[zZ][iI][pP]');
+        foreach($files as $file)
+        {
+            \File::move($file, $path);
         }
     }
 
@@ -91,6 +110,7 @@ class FindFromZipXml
     {
         $zipFileName = basename($file);
         $path = config("string_finder.xml_path");
+        $path .= "_".$this->quarter;
         $backupPath = $path . "/backup/$zipFileName";
 
         \File::move($file, $backupPath);
