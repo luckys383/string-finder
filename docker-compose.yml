@@ -1,0 +1,21 @@
+###############################################################################
+#                          Generated on phpdocker.io                          #
+###############################################################################
+version: "3.1"
+services:
+
+  php_fpm:
+    build: .
+    container_name: string_finder_fpm
+    working_dir: /var/app
+    volumes:
+      - .:/var/app
+    ports:
+     - 8081:8080
+    networks:
+      - string-finder-network
+
+#Docker Networks
+networks:
+  string-finder-network:
+    driver: bridge
