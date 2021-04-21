@@ -12,7 +12,7 @@ class FindStringFromZipXml extends Command
      *
      * @var string
      */
-    protected $signature = 'find:zip:xml {string} {quarter=1} {limit=all}';
+    protected $signature = 'find:zip:xml {string} {quarter=1} {year=2019} {limit=all}';
 
     /**
      * The console command description.
@@ -41,10 +41,12 @@ class FindStringFromZipXml extends Command
         $string = $this->argument('string');
         $limit = $this->argument('limit');
         $quarter = $this->argument('quarter');
+        $year = $this->argument('year');
 
         $this->info("Finding Company in Quarter:- ". $quarter);
         
         $service->setString($string)
+                ->setYear($year)
                 ->setQuarter($quarter)
                 ->setLimit($limit)
                 ->exec();

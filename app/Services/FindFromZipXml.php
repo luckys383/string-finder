@@ -9,9 +9,16 @@ class FindFromZipXml
     protected $string = "Frenchtown II Solar";
     protected $limit = "all";
     protected $quarter = 1;
+    protected $year = 2019;
 
     public function __construct()
     {
+    }
+
+    public function setYear($year)
+    {
+        $this->year = $year;
+        return $this;
     }
 
     public function setQuarter($quarter)
@@ -34,6 +41,7 @@ class FindFromZipXml
     public function exec()
     {
         $path = config("string_finder.xml_path");
+        $path = sprintf($path, $this->year);
         $path .= "_".$this->quarter;
         $tmpPath = $path . "/tmp";
         $files = glob($path . '/*.[zZ][iI][pP]');
@@ -65,15 +73,16 @@ class FindFromZipXml
                 error_log("Total number of processed files are " . ($key+1) . "/" . $totalFiles);
             }
 
-            if($isFindString) {
-                break;
-            }
+            // if($isFindString) {
+            //     break;
+            // }
         }
     }
 
     public function restoreFiles()
     {
         $path = config("string_finder.xml_path");
+        $path = sprintf($path, $this->year);
         $path .= "_".$this->quarter;
         $backupPath = $path . "/backup/";
         $files = glob($backupPath . '/*.[zZ][iI][pP]');
@@ -106,7 +115,7 @@ class FindFromZipXml
                 
                 $isSeller = $reader->getAttribute('IsSeller');
                 $isBuyer = $reader->getAttribute('IsBuyer');
-                if(strtolower($name) == strtolower($this->string) && $isSeller == "true") {
+                if(strtolower($name) == strtolower($this->string)) {
 
                     $calcuateRevenueObj = new SellerTransactions($file);
                     $calcuateRevenueObj->filterTransactions();
@@ -125,7 +134,7 @@ class FindFromZipXml
                     error_log("Is Buyer: $isBuyer");
                     error_log(" --------------------------------- ");
                     $isFindString = true;
-                    break;
+                    // break;
                 }
             }
         }
@@ -138,6 +147,7 @@ class FindFromZipXml
     {
         $zipFileName = basename($file);
         $path = config("string_finder.xml_path");
+        $path = sprintf($path, $this->year);
         $path .= "_".$this->quarter;
         $backupPath = $path . "/backup/$zipFileName";
 
