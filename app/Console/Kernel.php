@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        \App\Console\Commands\FindStringFromZipXml::class
+        \App\Console\Commands\FindStringFromZipXml::class,
+        \App\Console\Commands\CalculateProductStatsFromZipXml::class,
     ];
 
     /**
